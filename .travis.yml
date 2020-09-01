@@ -36,7 +36,7 @@ install:
 
 before_script:
   - cd $TRAVIS_BUILD_DIR
-  - docker-compose up
+  - docker-compose up -d
 #  - cp config/sys.config.template config/sys.config
   - cp config/tls-enable-sys.config config/sys.config
   - sleep 20
