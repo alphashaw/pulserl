@@ -4,7 +4,7 @@
 [![LICENSE](https://img.shields.io/badge/License-Apache%202-blue.svg)](https://github.com/skulup/pulserl/blob/master/LICENSE)
 # Pulserl
 #### An Apache Pulsar client for Erlang/Elixir
-__Version:__ 0.1.2
+__Version:__ 0.1.3
 
 Pulserl is an Erlang client for the Apache Pulsar Pub/Sub system with both producer and consumer
 implementations. It requires a version __2.0+__ of Apache Pulsar and __18.0+__ of Erlang.
@@ -270,7 +270,7 @@ To receive a message `pulserl:consume/1` should be used in a loop, for example:
 
 ```erlang
 receive_message(PidOrTopic) ->
-  case pulserl:consume(Pid) of
+  case pulserl:consume(PidOrTopic) of
     #consMessage{} = ConsumerMsg ->
       pulserl:ack(ConsumerMsg),
       ConsumerMsg;

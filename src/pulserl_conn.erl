@@ -482,8 +482,12 @@ do_reconnect(State) ->
   end.
 
 create_connection(#state{logical_address = LogicalAddress, socket_module = SockMod} = State) ->
-  Addresses = pulserl_utils:logical_to_physical_addresses(LogicalAddress, SockMod == ssl),
-  connect_to_brokers(State, Addresses).
+  case pulserl_utils:logical_to_physical_addresses(LogicalAddress, SockMod == ssl) of
+    {error, _} = Error ->
+      Error;
+    Addresses ->
+      connect_to_brokers(State, Addresses)
+  end.
 
 
 connect_to_brokers(State, [{IpAddress, Port} | Rest]) ->
@@ -503,6 +507,7 @@ connect_to_broker(#state{
   socket_module = SockMod,
   connect_timeout = ConnectTimeout} = State, IpAddress, Port) ->
   TcpOptions = [binary, {active, false} | State#state.tcp_options],
+  error_logger:info_msg("Connecting to broker ~s:~p", [erlwater_net:ip_to_binary(IpAddress), Port]),
   case SockMod:connect(IpAddress, Port, TcpOptions, ConnectTimeout) of
     {ok, Socket} ->
       {ok, State#state{
@@ -538,7 +543,7 @@ perform_handshake(#state{socket = Socket, socket_module = SockMod} = State) ->
             #'CommandError'{
               error = Error, message = ErrorMessage
             } ->
-              {error, Error, ErrorMessage}
+              {error, {Error, ErrorMessage}}
           end;
         {error, Reason} ->
           error_logger:error_msg("Error making the connect handsake. Reason: ~p", [Reason]),
